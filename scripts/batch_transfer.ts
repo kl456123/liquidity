@@ -21,28 +21,14 @@ import { HighloadQueryId } from "../src/wrappers/HighloadQueryId";
 import { mnemonicToPrivateKey } from "@ton/crypto";
 import { generateCoffeeMessages } from "../src/coffee";
 import { jettonInfos, HIGHLOAD_V3_CODE } from "../src/constants";
-
-import dotenv from "dotenv";
-dotenv.config();
-
-const endpoint = "https://toncenter.com/api/v2/jsonRPC";
+import { getClientAndKeypair } from "../src/utils";
 
 async function getProviderAndWallet(url: string) {
-  const tonClient = new TonClient({
-    endpoint,
-    apiKey: "29e1e595ee8059a1877eee0caf20bdabec926e87ebea89b39192cdef078ef4c7",
-  });
-
-  if (!process.env.MNEMONIC) {
-    throw new Error("Environment variable MNEMONIC is required.");
-  }
-
-  const mnemonic = process.env.MNEMONIC.split(" ");
-  const keys = await mnemonicToPrivateKey(mnemonic);
+  const { tonClient, keypair } = await getClientAndKeypair();
   const wallet = tonClient.open(
     WalletContractV4.create({
       workchain: 0,
-      publicKey: keys.publicKey,
+      publicKey: keypair.publicKey,
     }),
   );
 
@@ -53,7 +39,7 @@ async function getProviderAndWallet(url: string) {
   const highloadWallet = tonClient.open(
     HighloadWalletV3.createFromConfig(
       {
-        publicKey: keys.publicKey,
+        publicKey: keypair.publicKey,
         subwalletId: 0x10ad,
         timeout: 60 * 60, // 1 hour
       },
@@ -69,7 +55,7 @@ async function getProviderAndWallet(url: string) {
   return {
     tonClient,
     wallet,
-    secretKey: keys.secretKey,
+    secretKey: keypair.secretKey,
     highloadWallet,
     jettonMinter,
   };
