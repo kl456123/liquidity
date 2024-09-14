@@ -23,7 +23,7 @@ import { generateCoffeeMessages } from "../src/coffee";
 import { jettonInfos, HIGHLOAD_V3_CODE } from "../src/constants";
 import { getClientAndKeypair } from "../src/utils";
 
-async function getProviderAndWallet(url: string) {
+async function getProviderAndWallet() {
   const { tonClient, keypair } = await getClientAndKeypair();
   const wallet = tonClient.open(
     WalletContractV4.create({
@@ -156,7 +156,7 @@ async function batchTransferByHighloadWallet(
 
 async function main() {
   const { tonClient, wallet, secretKey, highloadWallet, jettonMinter } =
-    await getProviderAndWallet(endpoint);
+    await getProviderAndWallet();
 
   // usdt decimal: 6
 
